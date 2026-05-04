@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WriteWise Uni</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #111827;
+    }
+    header {
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: white;
+      padding: 28px 18px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+    }
+    header h1 { margin: 0; font-size: 32px; }
+    header p { color: #d1d5db; line-height: 1.6; }
+    .container { max-width: 1000px; margin: auto; padding: 18px; }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      line-height: 1.6;
+    }
+    select, button, input {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+    button {
+      background: #111827;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+    button.secondary { background: #e5e7eb; color: #111827; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .score {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .score h3 { margin: 0; color: #6b7280; font-size: 14px; }
+    .score p { margin: 8px 0 0; font-size: 28px; font-weight: bold; }
+    .issue {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+    .good {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 14px;
+      border-radius: 14px;
+    }
+    .warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 14px;
+      border-radius: 14px;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+    .privacy-note {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 14px;
+      border-radius: 14px;
+      line-height: 1.6;
+      margin-top: 12px;
+      color: #475569;
+    }
+    .login-box {
+      display: none;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      padding: 16px;
+      border-radius: 16px;
+      margin-top: 14px;
+    }
+    .login-box input { width: 100%; margin-bottom: 8px; }
+    .result-box {
+      background: #111827;
+      color: white;
+      padding: 18px;
+      border-radius: 18px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .small { color: #6b7280; font-size: 14px; line-height: 1.6; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .nav button { background: white; color: #111827; border: 1px solid #d1d5db; }
+    .nav button.active { background: #111827; color: white; }
+    .loading {
+      display: none;
+      color: #1d4ed8;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>WriteWise Uni</h1>
+    <p>Live AI grammar checker, writing skill coach, British / US English option, similarity risk and AI-writing probability estimate for students and working adults.</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Paste your writing</h2>
+      <p class="small">You can paste essay, assignment, email, report or workplace writing.</p>
+
+      <div class="warning">
+        <b>Important Note:</b><br>
+        This is an early prototype for testing purpose. You can use 3 grammar checks without sign up. After 3 checks, email verification is required to continue using the app for free.
+        <br><br>
+        <b>No payment is required at this stage.</b> Early access is free until <b>16 May 2026</b>. After that, this website may be upgraded with login, usage limit and paid plan features.
+      </div>
+
+      <div class="privacy-note">
+        <b>Privacy Note:</b><br>
+        This prototype sends submitted writing to an AI checking service for grammar and writing feedback. Please do not paste confidential company information, private personal data, banking details, card number, CVV, password or sensitive documents.
+      </div>
+
+      <div id="usageStatus" class="small" style="margin-top:12px;"></div>
+
+      <div id="emailLoginBox" class="login-box">
+        <b>Continue Free Access</b>
+        <p class="small">
+          You have used 3 free checks. Please enter your email to continue using WriteWise Uni for free.
+        </p>
+
+        <input id="userEmail" type="email" placeholder="Enter your email address" />
+        <button onclick="saveEmailAndSendTac()">Send TAC</button>
+        <p id="emailError" class="small" style="color:#b91c1c;"></p>
+
+        <div id="tacArea" style="display:none; margin-top:12px;">
+          <p class="small">
+            Demo TAC number: <b id="demoTacNumber"></b><br>
+            Prototype note: Real email TAC will be added after upgrade.
+          </p>
+          <input id="tacInput" type="text" placeholder="Enter TAC number" />
+          <button onclick="verifyTac()">Verify TAC</button>
+          <p id="tacError" class="small" style="color:#b91c1c;"></p>
+        </div>
+      </div>
+
+      <textarea id="inputText">I walk to him yesterday. The supplier have already send the invoice. The color on the label is different than our previous order.</textarea>
+
+      <div class="row">
+        <select id="englishType">
+          <option value="British">British English</option>
+          <option value="American">US English</option>
+        </select>
+
+        <select id="toneType">
+          <option value="Student">Student</option>
+          <option value="Professional">Professional</option>
+          <option value="Formal">Formal</option>
+        </select>
+
+        <button id="checkBtn" onclick="checkWriting()">Check Writing</button>
+        <button class="secondary" onclick="clearText()">Clear</button>
+      </div>
+
+      <div id="loading" class="loading">Checking with AI...</div>
+      <p id="apiError" class="small" style="color:#b91c1c;"></p>
+    </div>
+
+    <div class="card">
+      <h2>Overall Report</h2>
+      <div class="score-grid">
+        <div class="score">
+          <h3>Writing Score</h3>
+          <p id="writingScore">--</p>
+        </div>
+        <div class="score">
+          <h3>Grammar Issues</h3>
+          <p id="grammarCount">--</p>
+        </div>
+        <div class="score">
+          <h3>Similarity Risk</h3>
+          <p id="similarityScore">--</p>
+        </div>
+        <div class="score">
+          <h3>AI Probability</h3>
+          <p id="aiScore">--</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card nav">
+      <button class="active" onclick="showTab('grammar', this)">Grammar</button>
+      <button onclick="showTab('skills', this)">Writing Skills</button>
+      <button onclick="showTab('similarity', this)">Similarity</button>
+      <button onclick="showTab('ai', this)">AI / Human</button>
+      <button onclick="showTab('rewrite', this)">Rewrite</button>
+    </div>
+
+    <div id="grammar" class="card tab active">
+      <h2>Grammar Mistakes</h2>
+      <div id="grammarResult" class="small">Click “Check Writing” first.</div>
+    </div>
+
+    <div id="skills" class="card tab">
+      <h2>Writing Skill Suggestions</h2>
+      <div id="skillsResult">
+        <div class="good">This app will help users improve clarity, tone, sentence structure and academic writing style.</div>
+      </div>
+    </div>
+
+    <div id="similarity" class="card tab">
+      <h2>Similarity Risk</h2>
+      <div id="similarityResult" class="warning">Similarity result is an estimate only. Real launch needs plagiarism or search API connection.</div>
+    </div>
+
+    <div id="ai" class="card tab">
+      <h2>AI or Human Writing Estimate</h2>
+      <div id="aiResult" class="warning">AI-writing score is only an estimate. It should not be used as final proof of misconduct.</div>
+    </div>
+
+    <div id="rewrite" class="card tab">
+      <h2>Improved Version</h2>
+      <div id="rewriteResult" class="result-box">Click “Check Writing” first.</div>
+    </div>
+
+    <div class="card warning">
+      <b>Important:</b> This version uses a backend AI API route. Do not place your API key inside this HTML file.
+    </div>
+  </div>
+
+  <script>
+    const FREE_CHECK_LIMIT = 3;
+    const EARLY_ACCESS_EXPIRY = "16 May 2026";
+
+    function getCheckCount() {
+      return Number(localStorage.getItem("writewise_check_count") || 0);
+    }
+
+    function setCheckCount(count) {
+      localStorage.setItem("writewise_check_count", String(count));
+    }
+
+    function getUserEmail() {
+      return localStorage.getItem("writewise_user_email") || "";
+    }
+
+    function isEmailVerified() {
+      return localStorage.getItem("writewise_email_verified") === "yes";
+    }
+
+    function isLoggedInFree() {
+      return !!getUserEmail() && isEmailVerified();
+    }
+
+    function generateTac() {
+      const tac = String(Math.floor(100000 + Math.random() * 900000));
+      localStorage.setItem("writewise_tac", tac);
+      document.getElementById("demoTacNumber").innerText = tac;
+      document.getElementById("tacArea").style.display = "block";
+    }
+
+    function saveEmailAndSendTac() {
+      const email = document.getElementById("userEmail").value.trim();
+      const emailError = document.getElementById("emailError");
+
+      if (!email || !email.includes("@") || !email.includes(".")) {
+        emailError.innerText = "Please enter a valid email address.";
+        return;
+      }
+
+      localStorage.setItem("writewise_user_email", email);
+      emailError.innerText = "";
+      generateTac();
+      updateUsageStatus();
+    }
+
+    function verifyTac() {
+      const enteredTac = document.getElementById("tacInput").value.trim();
+      const savedTac = localStorage.getItem("writewise_tac");
+      const tacError = document.getElementById("tacError");
+
+      if (enteredTac !== savedTac) {
+        tacError.innerText = "Invalid TAC number. Please try again.";
+        return;
+      }
+
+      localStorage.setItem("writewise_email_verified", "yes");
+      document.getElementById("emailLoginBox").style.display = "none";
+      tacError.innerText = "";
+      updateUsageStatus();
+
+      alert("Email verified. Free access unlocked until " + EARLY_ACCESS_EXPIRY + ".");
+    }
+
+    function updateUsageStatus() {
+      const count = getCheckCount();
+      const email = getUserEmail();
+      const usageStatus = document.getElementById("usageStatus");
+
+      if (!usageStatus) return;
+
+      if (isLoggedInFree()) {
+        usageStatus.innerHTML = `
+          <b>Status:</b> Free access unlocked with verified email: ${email}<br>
+          You can continue using British / US English grammar check for free until <b>${EARLY_ACCESS_EXPIRY}</b>.
+        `;
+      } else {
+        const remaining = Math.max(0, FREE_CHECK_LIMIT - count);
+        usageStatus.innerHTML = `
+          <b>Status:</b> ${remaining} free checks remaining before free email sign up is required.<br>
+          Early access is free. No payment is required.
+        `;
+      }
+    }
+
+    function resetDemoAccess() {
+      localStorage.removeItem("writewise_check_count");
+      localStorage.removeItem("writewise_user_email");
+      localStorage.removeItem("writewise_email_verified");
+      localStorage.removeItem("writewise_tac");
+      updateUsageStatus();
+      alert("Demo usage has been reset.");
+    }
+
+    function showTab(tabId, button) {
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      button.classList.add("active");
+    }
+
+    function clearText() {
+      document.getElementById("inputText").value = "";
+      document.getElementById("writingScore").innerText = "--";
+      document.getElementById("grammarCount").innerText = "--";
+      document.getElementById("similarityScore").innerText = "--";
+      document.getElementById("aiScore").innerText = "--";
+      document.getElementById("grammarResult").innerHTML = "Click “Check Writing” first.";
+      document.getElementById("rewriteResult").innerText = "Click “Check Writing” first.";
+      document.getElementById("apiError").innerText = "";
+    }
+
+    function renderGrammarIssues(issues) {
+      if (!issues || issues.length === 0) {
+        document.getElementById("grammarResult").innerHTML = '<div class="good">No major grammar issue found.</div>';
+        return;
+      }
+
+      document.getElementById("grammarResult").innerHTML = issues.map((issue) => `
+        <div class="issue">
+          <b>${escapeHtml(issue.title || "Writing issue")}</b><br>
+          Problem: ${escapeHtml(issue.problem || "-")}<br>
+          Suggested fix: <b>${escapeHtml(issue.fix || "-")}</b><br>
+          Explanation: ${escapeHtml(issue.explanation || "-")}
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function checkWriting() {
+      const currentCount = getCheckCount();
+
+      if (!isLoggedInFree() && currentCount >= FREE_CHECK_LIMIT) {
+        document.getElementById("emailLoginBox").style.display = "block";
+        updateUsageStatus();
+        alert("You have used 3 free checks. Please verify your email to continue for free.");
+        return;
+      }
+
+      const text = document.getElementById("inputText").value.trim();
+      const englishType = document.getElementById("englishType").value;
+      const toneType = document.getElementById("toneType").value;
+
+      if (!text) {
+        alert("Please paste your writing first.");
+        return;
+      }
+
+      if (!isLoggedInFree()) {
+        setCheckCount(currentCount + 1);
+      }
+
+      updateUsageStatus();
+
+      const checkBtn = document.getElementById("checkBtn");
+      const loading = document.getElementById("loading");
+      const apiError = document.getElementById("apiError");
+
+      checkBtn.disabled = true;
+      loading.style.display = "block";
+      apiError.innerText = "";
+
+      try {
+        const response = await fetch("/api/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, englishType, toneType })
+        });
+
+        if (!response.ok) {
+          throw new Error("AI check failed. Please try again.");
+        }
+
+        const result = await response.json();
+
+        document.getElementById("writingScore").innerText = `${result.writingScore ?? "--"}%`;
+        document.getElementById("grammarCount").innerText = String((result.issues || []).length);
+        document.getElementById("similarityScore").innerText = `${result.similarityRisk ?? 0}%`;
+        document.getElementById("aiScore").innerText = `${result.aiProbability ?? 0}%`;
+
+        renderGrammarIssues(result.issues || []);
+
+        document.getElementById("skillsResult").innerHTML = `
+          <div class="good">
+            <b>Writing mode:</b> ${escapeHtml(toneType)}<br><br>
+            ${(result.writingSuggestions || []).map((s, i) => `Suggestion ${i + 1}: ${escapeHtml(s)}`).join("<br>")}
+          </div>
+        `;
+
+        document.getElementById("similarityResult").innerHTML = `
+          <div class="warning">
+            Estimated similarity risk: <b>${result.similarityRisk ?? 0}%</b><br><br>
+            ${escapeHtml(result.similarityNote || "Similarity result is an estimate only.")}
+          </div>
+        `;
+
+        document.getElementById("aiResult").innerHTML = `
+          <div class="warning">
+            Estimated AI-writing probability: <b>${result.aiProbability ?? 0}%</b><br><br>
+            ${escapeHtml(result.aiNote || "AI score is only an estimate.")}
+          </div>
+        `;
+
+        document.getElementById("rewriteResult").innerText = result.improvedVersion || "No rewrite returned.";
+      } catch (error) {
+        apiError.innerText = error.message || "Something went wrong.";
+      } finally {
+        checkBtn.disabled = false;
+        loading.style.display = "none";
+      }
+    }
+
+    updateUsageStatus();
+  </script>
+</body>
+</html>
