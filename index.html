@@ -156,9 +156,9 @@
       <div id="usageStatus" class="small" style="margin-top:12px;"></div>
 
       <div id="emailLoginBox" class="login-box">
-        <b>Continue Free Access</b>
+        <b>Login / Sign Up for Free Access</b>
         <p class="small">
-          You have used 3 free checks. Please enter your email to continue using WriteWise Uni for free.
+          Enter your email to sign up or continue using WriteWise Uni for free. No payment is required at this stage.
         </p>
 
         <input id="userEmail" type="email" placeholder="Enter your email address" />
@@ -192,6 +192,8 @@
 
         <button id="checkBtn" onclick="checkWriting()">Check Writing</button>
         <button class="secondary" onclick="clearText()">Clear</button>
+        <button class="secondary" onclick="showEmailLogin()">Login / Sign Up Free</button>
+        <button class="secondary" onclick="logoutFreeAccess()">Logout</button>
       </div>
 
       <div id="loading" class="loading">Checking with AI...</div>
@@ -256,9 +258,10 @@
     </div>
 
     <div class="card warning">
-      <b>Important:</b> This version uses a backend AI API route. Do not place your API key inside this HTML file.
+       <b>Important:</b> This is an early access writing support tool. Results are generated for writing improvement only and should be reviewed before submission or official use.
+       <br><br>
+       <b>Privacy Note:</b> Please do not paste confidential company information, private personal data, banking details, card numbers, CVV, passwords or sensitive documents into this website.
     </div>
-  </div>
 
   <script>
     const FREE_CHECK_LIMIT = 3;
@@ -291,6 +294,26 @@
       document.getElementById("tacArea").style.display = "block";
     }
 
+function showEmailLogin() {
+  document.getElementById("emailLoginBox").style.display = "block";
+  document.getElementById("emailLoginBox").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+  updateUsageStatus();
+}
+
+function logoutFreeAccess() {
+  localStorage.removeItem("writewise_user_email");
+  localStorage.removeItem("writewise_email_verified");
+  localStorage.removeItem("writewise_tac");
+
+  document.getElementById("emailLoginBox").style.display = "none";
+  updateUsageStatus();
+
+  alert("You have logged out from free access.");
+}
+    
     function saveEmailAndSendTac() {
       const email = document.getElementById("userEmail").value.trim();
       const emailError = document.getElementById("emailError");
